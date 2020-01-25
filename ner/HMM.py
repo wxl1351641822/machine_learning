@@ -4,15 +4,23 @@ import torch.optim as optim
 
 from processData import *
 class HMM(nn.Module):
-    def __init__(self,x_size,y_size):
+    def __init__(self,x_size,y_size):# y-label,x-word
+
         self.y_size=y_size;
         self.x_size=x_size;
-        self.transition=torch.randn(y_size,y_size);#转移概率p(y|y)
-        self.b=torch.randn(y_size,x_size);#发射概率P（x|y)
-        self.pi=torch.randn(y_size,1);#先验
-        self.transition=torch.tensor([[0.5,0.2,0.3],[0.3,0.5,0.2],[0.2,0.3,0.5]])
-        self.b=torch.tensor([[0.5,0.5],[0.4,0.6],[0.7,0.3]])
-        self.pi=torch.tensor([[0.2],[0.4],[0.4]])
+        # print(self.x_size, self.y_size)
+        self.transition=torch.rand(y_size,y_size);#转移概率p(y|y)
+        self.transition=self.transition/torch.sum(self.transition,axis=1).reshape(self.y_size,1);
+        self.b=torch.rand(y_size,x_size);#发射概率P（x|y)
+        self.b=self.b/torch.sum(self.b, axis=1).reshape(self.y_size,1);
+        print(self.b.shape)
+        # print(torch.sum(self.b, axis=1))
+        self.pi=torch.rand(y_size,1);#先
+        self.pi=self.pi/torch.sum(self.pi)
+        # print(torch.sum(self.pi))
+        # self.transition=torch.tensor([[0.5,0.2,0.3],[0.3,0.5,0.2],[0.2,0.3,0.5]])
+        # self.b=torch.tensor([[0.5,0.5],[0.4,0.6],[0.7,0.3]])
+        # self.pi=torch.tensor([[0.2],[0.4],[0.4]])
 
 
     def alpha(self,x):#前向算法p(x1,x2,x3,...,xt,yt)
@@ -20,12 +28,34 @@ class HMM(nn.Module):
         # print(alpha)
         for i in range(1,len(x)):
             alpha=torch.cat((alpha,(torch.matmul(alpha[i-1],self.transition)*self.b[:,x[i]]).reshape(1,self.y_size)),0)
+            # print(alpha[i-1])
+            # print(self.transition)
         return alpha
 
     def beta(self,x):
-        beta=torch.ones(1,self.y_size)
-        for i in range(len(x)-2,-1,-1):
-            beta=torch.cat((torch.sum(beta[0]*self.transition*self.b[:,x[i+1]],axis=1).reshape(1,self.y_size),beta))
+        beta = torch.ones(1, self.y_size)
+        for i in range(len(x) - 2, -1, -1):
+            beta = torch.cat((torch.sum(beta[0] * self.transition * self.b[:, x[i + 1]], axis=1).reshape(1, self.y_size), beta))
+        return beta
+    def alpha_scaling(self,x):#前向算法p(x1,x2,x3,...,xt,yt)
+        # print(self.b[:])
+        alpha=(self.b[:,x[0]]*self.pi[:].reshape(self.y_size)).reshape(1,self.y_size)
+
+        # print(alpha)
+        for i in range(1,len(x)):
+            alpha[i-1]=alpha[i-1] / torch.sum(alpha[i-1], axis=0)
+            alpha=torch.cat((alpha,(torch.matmul(alpha[i-1],self.transition)*self.b[:,x[i]]).reshape(1,self.y_size)),0)
+            print(alpha[i-1],torch.matmul(alpha[i-1],self.transition))
+            print()
+            # print(self.transition)
+        alpha[len(alpha)-1]=alpha[len(alpha)-1] / torch.sum(alpha[len(alpha)-1], axis=0)
+        return alpha
+
+    def beta_scaling(self,x):
+        beta = torch.tensor([[1/self.y_size]*self.y_size])
+        for i in range(len(x) - 2, -1, -1):
+            k=torch.sum(beta[0] * self.transition * self.b[:, x[i + 1]], axis=1)
+            beta = torch.cat(((k/torch.sum(k)).reshape(1, self.y_size), beta))
         return beta
 
     def p(self,x,alpha):#p(x)
@@ -39,7 +69,13 @@ class HMM(nn.Module):
     #     return gamma
 
     def Viterbi(self,x):#贪婪
-        V=self.b[:,x[0]]*self.pi[:].reshape(self.y_size);
+        # print(x[0])
+        # print(self.b[:,x[0]])
+        # print(self.pi[:])
+        b=torch.log(self.b)
+        pi=torch.log(self.pi)
+        transition=torch.log(self.transition)
+        V=b[:,x[0]]+pi[:].reshape(self.y_size);
         list=[]
         # print(V)
         # 前向计算各部分概率
@@ -47,9 +83,13 @@ class HMM(nn.Module):
             # max,indices=torch.max(V[t - 1].reshape(self.y_size, 1) * self.transition, axis=0)
             # list.append(indices)
             # V=torch.cat((V,(self.b[:,x[t]]*max).reshape(1,self.y_size)),axis=0)
-            max, indices = torch.max(V.reshape(self.y_size,1) * self.transition, axis=0)
+            # print(V.reshape(self.y_size,1))
+            # print(self.transition)
+            # print(V.reshape(self.y_size,1) +self.transition)
+            max, indices = torch.max(V.reshape(self.y_size,1) +transition, axis=0)
+            # print(max)
             list.append(indices)
-            V=self.b[:,x[t]]*max
+            V=b[:,x[t]]+max
             # print(V)
         #后向寻找路径
         # print(list)
@@ -61,45 +101,141 @@ class HMM(nn.Module):
 
     def gamma(self,alpha,beta,p_x):
         # 返回：gamma_ij,p(yj|xi),行为x,列为y
-        return alpha*beta/p_x
+        return (alpha*beta)/p_x
 
-    def xi(self,x,alpha,beta):
+    def xi(self,x,alpha,beta,p_x):
         # print(alpha_yt,self.b[y_t1,x_t1],beta_yt1,self.transition[y_t,y_t1])
         # return alpha_yt*self.b[y_t1,x_t1]*beta_yt1*self.transition[y_t,y_t1]/p_x
         # return (t(xt),yt,yt+1)
         xi=[]
         for t in range(0,len(x)-1):
-            xi.append((alpha[t].reshape(self.y_size,1)*self.transition*self.b[:,x[t+1]]*beta[t+1]))
+            xi.append((alpha[t].reshape(self.y_size,1)*self.transition*self.b[:,x[t+1]]*beta[t+1])/p_x)
             # print(xi[t])
         return torch.cat(xi).reshape(len(xi),self.y_size,self.y_size)
 
-    def EM(self,traindata):#train
-        for x in traindata:
-            #E
-            alpha = self.alpha(x)
-            p_x=self.p(x,alpha)
-            beta=self.beta(x)
-            gamma=self.gamma(alpha,beta,p_x)
-            xi=self.xi(x,alpha,beta)
-            # print(gamma)
-            #M
-            #对时间求和了从t=1到t
-            gamma_sum=torch.sum(gamma,axis=0).reshape(self.y_size,1)
-            # print(gamma_sum)
-            self.b=torch.zeros(self.y_size,self.x_size)
-            for t in range(0,len(x)):
-                # print(self.b[:,x[t]])
-                self.b[:,x[t]]+=gamma[t]
-            # print(self.b)
-            self.b=self.b/gamma_sum
-            # 从t=1加到t-1
-            gamma_sum_=gamma_sum-gamma[len(x)-1].reshape(self.y_size,1)
-            # print(gamma_sum_)
-            # print(torch.sum(xi,axis=0))
-            self.transition=torch.sum(xi, axis=0)/gamma_sum_
+    def EM(self,x):#x是一个批次，可以是多个句子
+        #E
+        alpha = self.alpha_scaling(x)
+        print(alpha)
+        p_x=self.p(x,alpha)
+        beta=self.beta_scaling(x)
+        gamma=self.gamma(alpha,beta,p_x)
+        xi=self.xi(x,alpha,beta,p_x)
+        # print(gamma)
+        #M
+        #对时间求和了从t=1到t
+        gamma_sum=torch.sum(gamma,axis=0).reshape(self.y_size,1)
+        # print(gamma_sum)
+        self.b=torch.zeros(self.y_size,self.x_size)
+        for t in range(0,len(x)):
+            # print(self.b[:,x[t]])
+            self.b[:,x[t]]+=gamma[t]
+        # print(self.b)
+        self.b=self.b/gamma_sum
+        # 从t=1加到t-1
+        gamma_sum_=gamma_sum-gamma[len(x)-1].reshape(self.y_size,1)
+        # print(gamma_sum_)
+        # print(torch.sum(xi,axis=0))
+        self.transition=torch.sum(xi, axis=0)/gamma_sum_
+
+    def getTransitionFromData(self,x):
+        self.transition = torch.ones(self.y_size, self.y_size)
+        for row in x:
+            # print(x[i,1],,x[i+1,1])
+            for i in range(len(row)-1):
+                self.transition[row[i], row[i + 1]] += 1
+        # print(self.transition)
+        # print(torch.sum(transition,axis=1))
+        # print()
+        # print(1/45,15/45)
+        return self.transition / torch.sum(self.transition, axis=1).reshape(self.y_size, 1)
+        # torch.sum(transition[0])
+
+    def getb(self,x):
+        self.b = torch.ones(self.y_size,self.x_size)
+        for row in range(len(x[0])):
+            for i in range(len(x[0][row])):
+                self.b[x[1][row][i], x[0][row][i]] += 1
+        # print(self.b)
+        # print(torch.sum(b,axis=1))
+        # print(b/torch.sum(b,axis=1).reshape(len_label,1))
+        return self.b /torch.sum(self.b, axis=1).reshape(self.y_size, 1)
+
+    def trainbyP(self,x,train_size):#u
+        self.getTransitionFromData(x[1][0:train_size])
+        self.getb([x[0][0:train_size],x[1][0:train_size]])
+        # print(x[0][train_size:len(x[0])])
+        # print(self.transition)#2.3000e+01, 1.0000e+00, 5.7020e+03, 7.0000e+00, 1.0000e+00, 1.2000e+01,         2.0000e+00, 9.1500e+02]])
+        # print(self.b)
+
+        predict=self.Viterbi(x[0][train_size]).reshape(1,len(x[0][train_size]))
+        y=torch.tensor([x[1][train_size]])
+        for i in range(train_size+1,len(x[0])):
+            predict=torch.cat((predict,self.Viterbi(x[0][i]).reshape(1,len(x[0][i]))),axis=1)
+            # print(predict)
+            y=torch.cat((y,torch.tensor([x[1][i]])),axis=1)
+        # print(y)
+        # print(predict)
+        # print(predict)
+        # print(y)
+        # print(torch.sum(torch.eq(predict,y)))
+        # print(len(y))
+        print("acc,macro-F1,micro-F1:",self.measure(predict[0],y[0]))
+
+    def trainbyEM(self,x):
+        for epoch in range(1):
+            print("epoch",epoch,":")
+            print(x[0][0])
+            self.EM(x[0][0])
+            predict = self.Viterbi(x[0][0]).reshape(1, len(x[0][0]))
+            y = torch.tensor([x[1][0]])
+            for i in range(1,3):
+                self.EM(x[0][i])
+                predict = torch.cat((predict, self.Viterbi(x[0][i]).reshape(1, len(x[0][i]))), axis=1)
+                # print(predict)
+                y = torch.cat((y, torch.tensor([x[1][i]])), axis=1)
+            print("acc,macro-F1,micro-F1:",self.measure(predict[0],y[0]))
+
+    def measure(self,predict,y):
+        acc = (torch.sum(torch.eq(predict, y))).type(torch.FloatTensor) / float(len(y))
+        TP=torch.zeros(self.y_size)
+        FP=torch.zeros(self.y_size)
+        FN=torch.zeros(self.y_size)
+        for i in range(len(y)):
+            if(y[i]==predict[i]):
+                TP[y[i]]+=1
+            else:
+                FP[predict[i]]+=1
+                FN[y[i]]+=1
+        # micro:算总的
+        micro_precision=torch.sum(TP)/(torch.sum(TP)+torch.sum(FP))
+        micro_recall=torch.sum(TP)/(torch.sum(TP)+torch.sum(FN))
+        micro_F1=2*(micro_precision*micro_recall)/(micro_precision+micro_recall)
+        # macro ：算每一类的然后平均
+        macro_precision=TP/(TP+FP)
+        macro_recall=TP/(TP+FN)
+        # print(macro_precision)
+        # print(macro_recall)
+        # print(macro_recall*macro_precision)
+        macro_F1=2*(macro_recall*macro_precision)/(macro_recall+macro_precision)
+        # print(macro_F1)
+        macro_F1=torch.mean(macro_F1)
+        return acc,micro_F1,macro_F1
 
 
 
+
+
+
+
+traindata,dic_word_list,dic_label_list,dic_word,dic_label=getAllTrain()
+# model=HMM(len(dic_word_list),len(dic_label_list))
+# train_size=int(len(traindata[0])/5)
+# print("频次统计计算:")
+# model.trainbyP(traindata,train_size*4)
+print("EM计算：")
+model1=HMM(len(dic_word_list),len(dic_label_list))
+model1.trainbyEM(traindata)
 
 
 
@@ -114,19 +250,24 @@ class HMM(nn.Module):
 
 
 # print(readFile("./CoNLL-2003/eng.train");)
-
-model=HMM(2,3)
-x=[0,1,0]
+#
+# model=HMM(2,3)
+# x=[0,1,0]
 # alpha=model.alpha(x);
+# alpha=model.alpha_scaling(x);
+# print(alpha)
+# beta=model.beta_scaling(x);
+# print(beta)
 # beta=model.beta(x);
 # p_x = model.p(x, alpha);
 # gamma=model.gamma(alpha,beta,p_x)
-# xi=model.xi(x,alpha,beta);
+# xi=model.xi(x,alpha,beta,p_x);
 # Viterbi=model.Viterbi(x)
+# print(Viterbi)
 # print(alpha)
 # print(beta)
 # print(gamma)
-traindata=[x]
-model.EM(traindata)
+# traindata=[x]
+# model.EM(traindata)
 
 

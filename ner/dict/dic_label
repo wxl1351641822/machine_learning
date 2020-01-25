@@ -1,0 +1,1 @@
+{'O': 0, 'B-MISC': 1, 'I-MISC': 2, 'B-ORG': 3, 'I-LOC': 4, 'I-PER': 5, 'I-ORG': 6, 'B-LOC': 7}
