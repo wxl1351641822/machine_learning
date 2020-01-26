@@ -45,8 +45,8 @@ class HMM(nn.Module):
         for i in range(1,len(x)):
             alpha[i-1]=alpha[i-1] / torch.sum(alpha[i-1], axis=0)
             alpha=torch.cat((alpha,(torch.matmul(alpha[i-1],self.transition)*self.b[:,x[i]]).reshape(1,self.y_size)),0)
-            print(alpha[i-1],torch.matmul(alpha[i-1],self.transition))
-            print()
+            # print(alpha[i-1],torch.matmul(alpha[i-1],self.transition))
+            # print()
             # print(self.transition)
         alpha[len(alpha)-1]=alpha[len(alpha)-1] / torch.sum(alpha[len(alpha)-1], axis=0)
         return alpha
@@ -116,27 +116,33 @@ class HMM(nn.Module):
     def EM(self,x):#x是一个批次，可以是多个句子
         #E
         alpha = self.alpha_scaling(x)
-        print(alpha)
+        # print(alpha)
         p_x=self.p(x,alpha)
+        # print(p_x)
         beta=self.beta_scaling(x)
+        # print(beta)
         gamma=self.gamma(alpha,beta,p_x)
+        # print(gamma)
         xi=self.xi(x,alpha,beta,p_x)
+        # print(xi)
         # print(gamma)
         #M
         #对时间求和了从t=1到t
         gamma_sum=torch.sum(gamma,axis=0).reshape(self.y_size,1)
         # print(gamma_sum)
-        self.b=torch.zeros(self.y_size,self.x_size)
+        self.b=torch.ones(self.y_size,self.x_size)
         for t in range(0,len(x)):
             # print(self.b[:,x[t]])
             self.b[:,x[t]]+=gamma[t]
-        # print(self.b)
-        self.b=self.b/gamma_sum
+        self.b=self.b/torch.sum(self.b,axis=1).reshape(self.y_size,1)
         # 从t=1加到t-1
         gamma_sum_=gamma_sum-gamma[len(x)-1].reshape(self.y_size,1)
         # print(gamma_sum_)
         # print(torch.sum(xi,axis=0))
-        self.transition=torch.sum(xi, axis=0)/gamma_sum_
+        self.transition=torch.sum(xi, axis=0)/torch.sum(torch.sum(xi, axis=0),axis=1).reshape(self.y_size,1)
+        # self.transition=self.transition/torch.sum(self.transition,axis=1).reshape(self.y_size,1)
+
+        # print(self.b)
 
     def getTransitionFromData(self,x):
         self.transition = torch.ones(self.y_size, self.y_size)
@@ -182,19 +188,23 @@ class HMM(nn.Module):
         # print(len(y))
         print("acc,macro-F1,micro-F1:",self.measure(predict[0],y[0]))
 
-    def trainbyEM(self,x):
+    def trainbyEM(self,x,train_size):
         for epoch in range(1):
             print("epoch",epoch,":")
-            print(x[0][0])
-            self.EM(x[0][0])
-            predict = self.Viterbi(x[0][0]).reshape(1, len(x[0][0]))
-            y = torch.tensor([x[1][0]])
-            for i in range(1,3):
-                self.EM(x[0][i])
+            # print(x[0][0])
+            word=[]
+            for i in range(0,train_size):
+                word+=(x[0][i])
+            self.EM(word)
+            predict = self.Viterbi(x[0][train_size]).reshape(1, len(x[0][train_size]))
+            y = torch.tensor([x[1][train_size]])
+            for i in range(train_size,len(x[0])):
+                # self.EM(x[0][i])
                 predict = torch.cat((predict, self.Viterbi(x[0][i]).reshape(1, len(x[0][i]))), axis=1)
                 # print(predict)
                 y = torch.cat((y, torch.tensor([x[1][i]])), axis=1)
-            print("acc,macro-F1,micro-F1:",self.measure(predict[0],y[0]))
+                if(i%100==0):
+                    print("acc,macro-F1,micro-F1:",self.measure(predict[0],y[0]))
 
     def measure(self,predict,y):
         acc = (torch.sum(torch.eq(predict, y))).type(torch.FloatTensor) / float(len(y))
@@ -229,13 +239,13 @@ class HMM(nn.Module):
 
 
 traindata,dic_word_list,dic_label_list,dic_word,dic_label=getAllTrain()
-# model=HMM(len(dic_word_list),len(dic_label_list))
-# train_size=int(len(traindata[0])/5)
-# print("频次统计计算:")
-# model.trainbyP(traindata,train_size*4)
+model=HMM(len(dic_word_list),len(dic_label_list))
+train_size=int(len(traindata[0])/5*4)
+print("频次统计计算:")
+model.trainbyP(traindata,train_size)
 print("EM计算：")
 model1=HMM(len(dic_word_list),len(dic_label_list))
-model1.trainbyEM(traindata)
+model1.trainbyEM(traindata,train_size)
 
 
 

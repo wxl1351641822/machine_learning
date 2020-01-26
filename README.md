@@ -8,3 +8,9 @@
 	* ai算法
 	* ner
 		* HMM(https://blog.csdn.net/weixin_40485502/article/details/103900184）
+			* 维特比
+			* 前向算法
+			* 后向算法
+			* EM(鲍姆-韦尔奇算法)：80%
+				* with scaling的前向，后向
+			* 频次统计：87%
