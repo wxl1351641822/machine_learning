@@ -14,3 +14,24 @@
 			* EM(鲍姆-韦尔奇算法)：80%
 				* with scaling的前向，后向
 			* 频次统计：87%
+		* CRF
+			* 三种表达方式
+				* 一般参数
+				* 简化参数形式
+				* 矩阵形式
+				* 一般参数->简化参数形式t_s2f()
+				* 简化参数形式->矩阵形式f2M()
+			* 三种计算p(y|x)
+				* 一般参数P_y_x_condition(self,y)
+				* 简化参数形式P_y_x_condition_with_f(self, y)
+				* 矩阵形式P_y_x_condition_with_M(y)
+				* 用前向后向算法计算$P(y_i|x)$:p_y_x_condition_alpha_beta(self,alpha, beta)
+				* 联合概率 （前向后向方法计算$p(y_{i-1}，y_i|x)$
+					*  p_y12_x_condition_alpha_beta(self,alpha, beta)
+			* 前向后向算法
+				* alpha(self)
+				* beta(self)
+			* 期望
+				* $E_{p(y|x)}(f_k)$:E_fk_py_x(self,k, alpha, beta)$E_{p(y|x)}(f_k)$
+			* 维特比
+				* Viterbi_M(self)
