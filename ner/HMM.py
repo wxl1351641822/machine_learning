@@ -5,7 +5,6 @@ import torch.optim as optim
 from processData import *
 class HMM(nn.Module):
     def __init__(self,x_size,y_size):# y-label,x-word
-
         self.y_size=y_size;
         self.x_size=x_size;
         # print(self.x_size, self.y_size)
