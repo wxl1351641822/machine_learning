@@ -1,1 +1,1 @@
-['O', 'B-MISC', 'I-MISC', 'B-ORG', 'I-LOC', 'I-PER', 'I-ORG', 'B-LOC']
+['I-ORG', 'B-PER', 'O', 'B-ORG', 'I-PER', 'I-LOC', 'B-LOC']

@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.optim as optim
+from tqdm import tqdm
 
 from processData import *
 class HMM(nn.Module):
@@ -16,6 +17,7 @@ class HMM(nn.Module):
         # print(torch.sum(self.b, axis=1))
         self.pi=torch.rand(y_size,1);#先
         self.pi=self.pi/torch.sum(self.pi)
+        self.epsilon=1e-8
         # print(torch.sum(self.pi))
         # self.transition=torch.tensor([[0.5,0.2,0.3],[0.3,0.5,0.2],[0.2,0.3,0.5]])
         # self.b=torch.tensor([[0.5,0.5],[0.4,0.6],[0.7,0.3]])
@@ -74,6 +76,8 @@ class HMM(nn.Module):
         b=torch.log(self.b)
         pi=torch.log(self.pi)
         transition=torch.log(self.transition)
+        # print(x,b.shape)
+        # print(b[:,x[0]])
         V=b[:,x[0]]+pi[:].reshape(self.y_size);
         list=[]
         # print(V)
@@ -96,6 +100,7 @@ class HMM(nn.Module):
         path=indices.reshape(1)
         for i in range(len(list)-1,-1,-1):
             path=torch.cat((list[0][path[0]].reshape(1),path))
+        # print(path)
         return path;#y1=path0,y2=path1
 
     def gamma(self,alpha,beta,p_x):
@@ -144,38 +149,50 @@ class HMM(nn.Module):
         # print(self.b)
 
     def getTransitionFromData(self,x):
-        self.transition = torch.ones(self.y_size, self.y_size)
+        epsilon = 1e-8
+        self.transition = torch.zeros(self.y_size, self.y_size)
+        self.pi=torch.zeros(self.y_size,1)
         for row in x:
             # print(x[i,1],,x[i+1,1])
+            self.pi[row[0]]+=1;
             for i in range(len(row)-1):
+
                 self.transition[row[i], row[i + 1]] += 1
+        self.transition[self.transition==0]=self.epsilon
+        self.pi[self.pi==0]==self.epsilon
+        self.pi=self.pi/torch.sum(self.pi)
         # print(self.transition)
         # print(torch.sum(transition,axis=1))
         # print()
         # print(1/45,15/45)
-        return self.transition / torch.sum(self.transition, axis=1).reshape(self.y_size, 1)
+        self.transition=self.transition / torch.sum(self.transition, axis=1).reshape(self.y_size, 1)
+        return self.transition,self.pi
         # torch.sum(transition[0])
 
     def getb(self,x):
-        self.b = torch.ones(self.y_size,self.x_size)
+
+        self.b = torch.zeros(self.y_size,self.x_size)
         for row in range(len(x[0])):
             for i in range(len(x[0][row])):
                 self.b[x[1][row][i], x[0][row][i]] += 1
+        self.b[self.b==0]=self.epsilon
         # print(self.b)
         # print(torch.sum(b,axis=1))
         # print(b/torch.sum(b,axis=1).reshape(len_label,1))
-        return self.b /torch.sum(self.b, axis=1).reshape(self.y_size, 1)
+        self.b=self.b /torch.sum(self.b, axis=1).reshape(self.y_size, 1)
+        return self.b
 
     def trainbyP(self,x,train_size):#u
         self.getTransitionFromData(x[1][0:train_size])
         self.getb([x[0][0:train_size],x[1][0:train_size]])
+        # print(self.transition)
         # print(x[0][train_size:len(x[0])])
         # print(self.transition)#2.3000e+01, 1.0000e+00, 5.7020e+03, 7.0000e+00, 1.0000e+00, 1.2000e+01,         2.0000e+00, 9.1500e+02]])
         # print(self.b)
 
         predict=self.Viterbi(x[0][train_size]).reshape(1,len(x[0][train_size]))
         y=torch.tensor([x[1][train_size]])
-        for i in range(train_size+1,len(x[0])):
+        for i in tqdm(range(train_size+1,len(x[0]))):
             predict=torch.cat((predict,self.Viterbi(x[0][i]).reshape(1,len(x[0][i]))),axis=1)
             # print(predict)
             y=torch.cat((y,torch.tensor([x[1][i]])),axis=1)
@@ -197,7 +214,7 @@ class HMM(nn.Module):
             self.EM(word)
             predict = self.Viterbi(x[0][train_size]).reshape(1, len(x[0][train_size]))
             y = torch.tensor([x[1][train_size]])
-            for i in range(train_size,len(x[0])):
+            for i in tqdm(range(train_size,len(x[0]))):
                 # self.EM(x[0][i])
                 predict = torch.cat((predict, self.Viterbi(x[0][i]).reshape(1, len(x[0][i]))), axis=1)
                 # print(predict)
@@ -207,9 +224,9 @@ class HMM(nn.Module):
 
     def measure(self,predict,y):
         acc = (torch.sum(torch.eq(predict, y))).type(torch.FloatTensor) / float(len(y))
-        TP=torch.zeros(self.y_size)
-        FP=torch.zeros(self.y_size)
-        FN=torch.zeros(self.y_size)
+        TP=torch.zeros(self.y_size,dtype=float)
+        FP=torch.zeros(self.y_size,dtype=float)
+        FN=torch.zeros(self.y_size,dtype=float)
         for i in range(len(y)):
             if(y[i]==predict[i]):
                 TP[y[i]]+=1
@@ -217,15 +234,22 @@ class HMM(nn.Module):
                 FP[predict[i]]+=1
                 FN[y[i]]+=1
         # micro:算总的
+        print(torch.sum(TP))
         micro_precision=torch.sum(TP)/(torch.sum(TP)+torch.sum(FP))
         micro_recall=torch.sum(TP)/(torch.sum(TP)+torch.sum(FN))
         micro_F1=2*(micro_precision*micro_recall)/(micro_precision+micro_recall)
         # macro ：算每一类的然后平均
+        TP[TP==0]=self.epsilon
+        FP[FP==0]=self.epsilon
+        FN[FN==0]=self.epsilon
         macro_precision=TP/(TP+FP)
         macro_recall=TP/(TP+FN)
-        # print(macro_precision)
-        # print(macro_recall)
-        # print(macro_recall*macro_precision)
+        print("TP:",TP)
+        print("FN:",FN)
+        print("FP:",FP)
+        print("P:",macro_precision)
+        print("R:",macro_recall)
+        print("F1:",macro_recall*macro_precision)
         macro_F1=2*(macro_recall*macro_precision)/(macro_recall+macro_precision)
         # print(macro_F1)
         macro_F1=torch.mean(macro_F1)

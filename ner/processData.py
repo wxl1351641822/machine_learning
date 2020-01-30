@@ -29,23 +29,23 @@ def readFile(filepath):
         result=[]
         dic_word_list=set()
         dic_label_list=set()
-        row=[["<BOS>", "O"]]
+        row=[]
         for x in article_split:
             if(len(x)==0):
-                 row.append(["<EOS>","O"])
-                 result.append(row)
-                 row=[]
-                 row.append(["<BOS>", "O"])
-
+                if(len(row)>0):
+                    # print(row)
+                    result.append(row)
+                    row=[]
             else:
                 row.append([x[0],x[len(x)-1]])
                 dic_word_list.add(x[0])
                 dic_label_list.add(x[len(x)-1])
-        row.append(["<EOS>", "O"])
-        result.append(row)
-        print(result)
-        dic_word_list.add("<EOS>")
-        dic_word_list.add("<BOS>")
+
+        if (len(row) > 0):
+            # print(row)
+            result.append(row)
+        # print(result)
+
         dic_word_list.add("<UNK>")
         dic_word_list = list(dic_word_list)
         dic_label_list = list(dic_label_list)
@@ -79,6 +79,8 @@ def getAllTrain():
     dic_word=quickReadFile_eval('./dict/dic_word')
     dic_label=quickReadFile_eval('./dict/dic_label')
     return traindata,dic_word_list,dic_label_list,dic_word,dic_label
+
+
 #
 #
 # def getTransitionFromData_(x,len_label):
@@ -104,6 +106,7 @@ def getAllTrain():
 #     return b/torch.sum(b,axis=1).reshape(len_label,1)
 
 # readFile("./CoNLL-2003/eng.train")
+readFile("./corpus/dh_msra.txt")
 # traindata,dic_word_list,dic_label_list,dic_word,dic_label=getAllTrain();
 # print(traindata)
 # getTransitionFromData(traindata,len(dic_label_list))
