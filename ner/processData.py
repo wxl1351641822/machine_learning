@@ -21,6 +21,16 @@ def getData(rowData,dic_label,dic_word):
         data_y.append(y_row)
     return [data_x,data_y]
 
+def getword_set(len1,x):
+    word_set=[]
+    for i in range(len1):
+        word_set.append([])
+    for i in range(len(x[0])):
+        for j in range(len(x[0][i])):
+            word_set[x[1][i][j]].append(x[0][i][j])
+    return word_set
+
+
 def readFile(filepath):
     with open(filepath,'r',encoding='utf-8') as f:
         article=f.readlines();
@@ -34,6 +44,7 @@ def readFile(filepath):
             if(len(x)==0):
                 if(len(row)>0):
                     # print(row)
+
                     result.append(row)
                     row=[]
             else:
@@ -48,7 +59,10 @@ def readFile(filepath):
 
         dic_word_list.add("<UNK>")
         dic_word_list = list(dic_word_list)
+
         dic_label_list = list(dic_label_list)
+        dic_label_list.insert(0,'<BEG>')
+        dic_label_list.append('<END>')
         with open('./dict/dic_word_list', 'w', encoding='utf-8') as f:
             f.write(str(dic_word_list))
         with open('./dict/dic_label_list', 'w', encoding='utf-8') as f:
@@ -64,6 +78,9 @@ def readFile(filepath):
         traindata = getData(result, dic_label, dic_word)
         with open('./dict/traindata', 'w', encoding='utf-8') as f:
             f.write(str(traindata))
+        word_set=getword_set(len(dic_label),traindata)
+        with open('./dict/word_set', 'w', encoding='utf-8') as f:
+            f.write(str(word_set))
         return traindata,dic_word_list,dic_label_list,dic_word,dic_label
 
 def quickReadFile_eval(path):
@@ -106,7 +123,7 @@ def getAllTrain():
 #     return b/torch.sum(b,axis=1).reshape(len_label,1)
 
 # readFile("./CoNLL-2003/eng.train")
-readFile("./corpus/dh_msra.txt")
+# readFile("./corpus/dh_msra.txt")
 # traindata,dic_word_list,dic_label_list,dic_word,dic_label=getAllTrain();
 # print(traindata)
 # getTransitionFromData(traindata,len(dic_label_list))

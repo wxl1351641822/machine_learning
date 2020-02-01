@@ -5,13 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a71a32b7-fbfe-4b23-bf0f-1d647686ba3a" name="Default Changelist" comment="">
-      <change afterPath="$PROJECT_DIR$/corpus/dh_msra.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/corpus/train_data.txt" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dicts/char2idx.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/dicts/tag2idx.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/CRF_M.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/processData_forCRF.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/CRF.py" beforeDir="false" afterPath="$PROJECT_DIR$/CRF.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/HMM.py" beforeDir="false" afterPath="$PROJECT_DIR$/HMM.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dict/dic_label" beforeDir="false" afterPath="$PROJECT_DIR$/dict/dic_label" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dict/dic_label_list" beforeDir="false" afterPath="$PROJECT_DIR$/dict/dic_label_list" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/dict/dic_word" beforeDir="false" afterPath="$PROJECT_DIR$/dict/dic_word" afterDir="false" />
@@ -28,11 +26,23 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/CRF.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="321">
-              <caret line="206" selection-start-line="206" selection-end-line="206" />
+            <state relative-caret-position="-715">
+              <caret line="197" column="4" lean-forward="true" selection-start-line="197" selection-start-column="4" selection-end-line="203" selection-end-column="20" />
+              <folding>
+                <element signature="e#0#12#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/CRF_M.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="34">
+              <caret line="348" lean-forward="true" selection-start-line="348" selection-end-line="348" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
               </folding>
@@ -43,8 +53,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/HMM.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-642">
-              <caret line="223" selection-start-line="223" selection-end-line="223" />
+            <state relative-caret-position="185">
+              <caret line="255" column="36" lean-forward="true" selection-start-line="224" selection-start-column="3" selection-end-line="255" selection-end-column="36" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
               </folding>
@@ -53,10 +63,13 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/processData.py">
+        <entry file="file://$PROJECT_DIR$/test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="169">
-              <caret line="108" column="30" selection-start-line="108" selection-start-column="30" selection-end-line="108" selection-end-column="30" />
+            <state relative-caret-position="95">
+              <caret line="332" column="37" lean-forward="true" selection-end-line="360" />
+              <folding>
+                <element signature="e#0#12#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -73,7 +86,12 @@
   <component name="FindInProjectRecents">
     <findStrings>
       <find>1069</find>
+      <find>self.f</find>
+      <find>self.l</find>
       <find>print</find>
+      <find>self.sequence_len</find>
+      <find>self.x</find>
+      <find>sequence_len</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -83,9 +101,13 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/dict/dic_word" />
-        <option value="$PROJECT_DIR$/processData.py" />
         <option value="$PROJECT_DIR$/HMM.py" />
+        <option value="$PROJECT_DIR$/processData_forCRF.py" />
+        <option value="$PROJECT_DIR$/processData.py" />
+        <option value="$PROJECT_DIR$/train/f_0" />
         <option value="$PROJECT_DIR$/CRF.py" />
+        <option value="$PROJECT_DIR$/test.py" />
+        <option value="$PROJECT_DIR$/CRF_M.py" />
       </list>
     </option>
   </component>
@@ -101,6 +123,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -118,11 +141,20 @@
               <item name="ner" type="462c0819:PsiDirectoryNode" />
               <item name="dict" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="ner" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ner" type="462c0819:PsiDirectoryNode" />
+              <item name="dicts" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="ner" type="b2602c69:ProjectViewProjectNode" />
+              <item name="ner" type="462c0819:PsiDirectoryNode" />
+              <item name="train" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -150,7 +182,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.CRF">
+  <component name="RunManager" selected="Python.test">
     <configuration name="CRF" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="ner" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -165,6 +197,28 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/CRF.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="CRF_M" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="ner" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/CRF_M.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -217,11 +271,35 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="test" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="ner" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/test.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.CRF_M" />
+        <item itemvalue="Python.test" />
         <item itemvalue="Python.CRF" />
-        <item itemvalue="Python.HMM" />
         <item itemvalue="Python.processData" />
+        <item itemvalue="Python.HMM" />
       </list>
     </recent_temporary>
   </component>
@@ -249,29 +327,37 @@
       <workItem from="1580130915266" duration="5319000" />
       <workItem from="1580206107852" duration="5897000" />
       <workItem from="1580373715082" duration="3315000" />
-      <workItem from="1580380555424" duration="5447000" />
+      <workItem from="1580380555424" duration="13105000" />
+      <workItem from="1580469418434" duration="15380000" />
     </task>
+    <task id="LOCAL-00001" summary="HMM：&#10;增加epsilon--防止0，可计算macro-F1&#10;加上pi的频率计算（之前忘记了）&#10;问题：O以外的标签错误率大。">
+      <created>1580386776767</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1580386776767</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="78058000" />
+    <option name="totallyTimeSpent" value="101096000" />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1550" height="838" extended-state="6" />
-    <editor active="true" />
+    <frame x="-7" y="-7" width="1550" height="838" extended-state="7" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.1689008" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.17091152" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" visible="true" weight="0.36260623" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.37252125" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.87110484" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.47875354" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Version Control" order="8" />
+      <window_info anchor="bottom" id="Version Control" order="8" weight="0.21529745" />
       <window_info anchor="bottom" id="Database Changes" order="9" />
       <window_info anchor="bottom" id="Event Log" order="10" side_tool="true" />
       <window_info anchor="bottom" id="Terminal" order="11" />
@@ -287,19 +373,65 @@
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="1" />
   </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="RECENTLY_FILTERED_USER_GROUPS">
+                <collection />
+              </option>
+              <option name="RECENTLY_FILTERED_BRANCH_GROUPS">
+                <collection />
+              </option>
+              <option name="COLUMN_ORDER">
+                <list>
+                  <option value="0" />
+                  <option value="1" />
+                  <option value="2" />
+                  <option value="3" />
+                </list>
+              </option>
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="RECENT_FILTERS">
+      <map>
+        <entry key="Branch">
+          <value>
+            <list />
+          </value>
+        </entry>
+        <entry key="User">
+          <value>
+            <list />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="HMM：&#10;增加epsilon--防止0，可计算macro-F1&#10;加上pi的频率计算（之前忘记了）&#10;问题：O以外的标签错误率大。" />
+    <option name="LAST_COMMIT_MESSAGE" value="HMM：&#10;增加epsilon--防止0，可计算macro-F1&#10;加上pi的频率计算（之前忘记了）&#10;问题：O以外的标签错误率大。" />
+  </component>
+  <component name="XDebuggerManager">
+    <watches-manager>
+      <configuration name="PythonConfigurationType">
+        <watch expression="alpha" />
+      </configuration>
+    </watches-manager>
+  </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
     <SUITE FILE_PATH="coverage/ner$HMM.coverage" NAME="HMM Coverage Results" MODIFIED="1580383412622" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/ner$CRF.coverage" NAME="CRF Coverage Results" MODIFIED="1580385181772" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
-    <SUITE FILE_PATH="coverage/ner$processData.coverage" NAME="processData Coverage Results" MODIFIED="1580383358685" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/ner$CRF.coverage" NAME="CRF Coverage Results" MODIFIED="1580481422053" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/ner$test.coverage" NAME="test Coverage Results" MODIFIED="1580483916342" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/ner$CRF_M.coverage" NAME="CRF_M Coverage Results" MODIFIED="1580536360224" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/ner$processData.coverage" NAME="processData Coverage Results" MODIFIED="1580474695152" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://D:/ruanjian/Visual Studio/Shared/Python36_64/Lib/site-packages/torch/nn/modules/module.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="11077">
-          <caret line="590" selection-start-line="590" selection-end-line="590" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/CoNLL-2003/eng.train">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
@@ -313,24 +445,10 @@
     <entry file="file://$PROJECT_DIR$/dict/train">
       <provider selected="true" editor-type-id="LargeFileEditor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/dict/traindata">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="38">
-          <caret column="1601910" lean-forward="true" selection-start-column="1601910" selection-end-column="1601910" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/dict/dic_label">
+    <entry file="file://$PROJECT_DIR$/dict/dic_word">
       <provider selected="true" editor-type-id="text-editor">
         <state>
-          <caret column="43" lean-forward="true" selection-start-column="37" selection-end-column="43" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/processData.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="169">
-          <caret line="108" column="30" selection-start-line="108" selection-start-column="30" selection-end-line="108" selection-end-column="30" />
+          <caret column="51956" lean-forward="true" selection-start-column="51956" selection-end-column="51956" />
         </state>
       </provider>
     </entry>
@@ -341,27 +459,101 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/dict/dic_word">
+    <entry file="file://$PROJECT_DIR$/processData_forCRF.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="51956" lean-forward="true" selection-start-column="51956" selection-end-column="51956" />
+        <state relative-caret-position="302">
+          <caret line="26" column="54" lean-forward="true" selection-start-line="26" selection-start-column="54" selection-end-line="26" selection-end-column="54" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/HMM.py">
+    <entry file="file://$PROJECT_DIR$/dict/word_set">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-642">
-          <caret line="223" selection-start-line="223" selection-end-line="223" />
+        <state relative-caret-position="-2394">
+          <caret column="1191" selection-start-column="1191" selection-end-column="1191" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dict/dic_label">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="43" selection-start-column="43" selection-end-column="43" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dict/dic_label_list">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="88" selection-start-column="88" selection-end-column="88" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/processData.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1558">
+          <caret line="82" column="34" selection-start-line="82" selection-start-column="34" selection-end-line="82" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CRF.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-715">
+          <caret line="197" column="4" lean-forward="true" selection-start-line="197" selection-start-column="4" selection-end-line="203" selection-end-column="20" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CRF.py">
+    <entry file="file://$PROJECT_DIR$/train/f_0">
+      <provider editor-type-id="text-editor">
+        <state>
+          <caret selection-end-line="102" selection-end-column="43" />
+        </state>
+      </provider>
+      <provider selected="true" editor-type-id="LargeFileEditor">
+        <state relative-caret-position="152">
+          <caret column="1578" lean-forward="true" selection-start-column="1578" selection-end-column="1578" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/dict/traindata">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="321">
-          <caret line="206" selection-start-line="206" selection-end-line="206" />
+        <state>
+          <caret column="2" selection-start-column="2" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://D:/ruanjian/Visual Studio/Shared/Python36_64/Lib/site-packages/torch/nn/modules/module.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="590" selection-start-line="590" selection-end-line="590" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/HMM.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="185">
+          <caret line="255" column="36" lean-forward="true" selection-start-line="224" selection-start-column="3" selection-end-line="255" selection-end-column="36" />
+          <folding>
+            <element signature="e#0#12#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="95">
+          <caret line="332" column="37" lean-forward="true" selection-end-line="360" />
+          <folding>
+            <element signature="e#0#12#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CRF_M.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="34">
+          <caret line="348" lean-forward="true" selection-start-line="348" selection-end-line="348" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
           </folding>

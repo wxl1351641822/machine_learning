@@ -1,15 +1,18 @@
 import torch
 import torch.nn as nn
 from processData import *
+from tqdm import tqdm
 # https://www.cnblogs.com/pinard/p/7048333.html
 class CRF(nn.Module):
-    def __init__(self,y_size,sequence_len,k,l):
+    def __init__(self,x_size,y_size,sequence_len,k,l):
         self.sequence_len = sequence_len;
+        self.x_size=x_size;#字的词典长度
         self.y_size = y_size;
         self.k=k
         self.l=l
         #转移
         #每个t有k组，每个y有2种状态，y1->y2,y2->y3,序列长3（k,i=1,2,y_i->y_i+1)
+
         self.t=torch.tensor([[[[0,1],[0,0]],[[0,1],[0,0]]],
                              [[[1,0],[0,0]],[[0,0],[0,0]]],
                              [[[0,0],[0,0]],[[0,0],[1,0]]],
@@ -192,8 +195,36 @@ class CRF(nn.Module):
     def E_fk_py_x(self,k, alpha, beta):  # E_{p(y|x)}(f_k)
         return torch.sum(self.f[k] * self.p_y12_x_condition_alpha_beta(alpha, beta))
 
+    def delta_log_L(self,alpha,beta):
+        print(self.f[:,3,[0,0,1,1],[0,1,1,0]])
+        #y=[0,1,1]
+        delta=torch.sum(self.f[:,3,[0,0,1,1],[0,1,1,0]],axis=(1))-torch.sum(self.f* self.p_y12_x_condition_alpha_beta(alpha, beta),axis=(1,2,3))
+        print(delta)
+        self.w=self.w+delta
+        return delta
 
-model=CRF(2,3,5,4)
+
+
+    def P_x_experience(self,x):
+        p=torch.zeros(self.x_size)
+        for row in x:
+            for word in row:
+                p[word]+=1
+        p=p/torch.sum(p)
+        print(p)
+        return p
+
+    # def E_fk_p_yx(self,k,alpha,beta):
+
+
+traindata,dic_word_list,dic_label_list,dic_word,dic_label=getAllTrain()
+k=5
+l=4
+# sequence_len=10
+# model1=CRF(len(dic_word),2,3,5,4)
+# model1=CRF(len(dic_word),len(dic_label),sequence_len,k,l)
+# model1.P_x_experience(traindata[0])
+model=CRF(len(dic_word),2,3,5,4)
 y=[0,1,1]
 
 print("求p(y|x)")
@@ -205,8 +236,6 @@ print("简化形式p(y|x)=p(y1=1,y2=2,y3=3|x)=",p_y_x_con)
 y=[0,1,1]
 p_y_x_con=model.P_y_x_condition_with_M(y)
 print("矩阵形式p(y|x)=p(y1=1,y2=2,y3=3|x)=",p_y_x_con)
-
-
 
 ##维特比解码
 print("维特比解码，获得最优路径:",model.Viterbi_M())
@@ -224,3 +253,5 @@ print("由beta得到的Z",model.Z_beta(beta))
 print("p(yi|x):\n",model. p_y_x_condition_alpha_beta(alpha, beta))
 print("p(y_{i-1}，y_i|x):\n",model. p_y12_x_condition_alpha_beta(alpha, beta))
 print("E_{p(y|x)}(f_k):\n",model.E_fk_py_x(1,alpha,beta))
+print()
+model.delta_log_L(alpha,beta)
