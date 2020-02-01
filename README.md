@@ -35,3 +35,9 @@
 				* $E_{p(y|x)}(f_k)$:E_fk_py_x(self,k, alpha, beta)$E_{p(y|x)}(f_k)$
 			* 维特比
 				* Viterbi_M(self)
+			* 学习
+				* 计算delta
+				* 一个样本（一句话），根据特征函数可以计算出一组self.f
+				* 目前缺点速度及其慢
+			* CRF--对应于统计学习书上例11.1
+			* CRF-M---是对ner进行计算。
