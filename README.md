@@ -41,4 +41,6 @@
 				* 目前缺点速度及其慢
 			* CRF--对应于统计学习书上例11.1
 			* CRF-M---是对ner进行计算。
-			* 
+		* LSTM
+			* LSTMbypytorch--使用LSTM实现序列标注（pytorch）
+			* myLSTM---自实现LSTM前向及BPTT
