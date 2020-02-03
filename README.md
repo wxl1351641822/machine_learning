@@ -7,14 +7,14 @@
 * 自我学习
 	* ai算法
 	* ner
-		* HMM(https://blog.csdn.net/weixin_40485502/article/details/103900184）
+		* HMM[我的HMM博客](https://blog.csdn.net/weixin_40485502/article/details/103900184）
 			* 维特比
 			* 前向算法
 			* 后向算法
 			* EM(鲍姆-韦尔奇算法)：80%
 				* with scaling的前向，后向
 			* 频次统计：87%
-		* CRF
+		* CRF[我的CRF笔记](https://blog.csdn.net/weixin_40485502/article/details/104094857)
 			* 三种表达方式
 				* 一般参数
 				* 简化参数形式
@@ -41,3 +41,4 @@
 				* 目前缺点速度及其慢
 			* CRF--对应于统计学习书上例11.1
 			* CRF-M---是对ner进行计算。
+			* 
