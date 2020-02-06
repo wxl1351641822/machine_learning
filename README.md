@@ -44,3 +44,7 @@
 		* LSTM（https://blog.csdn.net/weixin_40485502/article/details/104162822）
 			* LSTMbypytorch--使用LSTM实现序列标注（pytorch）
 			* myLSTM---自实现LSTM前向及BPTT
+			* LSTMbyPytorchforNer---pytorchLSTM,带batch
+				* lossfunction带batch输入怎么办？？？
+			* LSTMbyPytorchforNer_singlebatch--一次输入一个句子
+			* myLSTMforNer---自实现LSTM(用于ner）
