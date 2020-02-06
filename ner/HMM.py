@@ -219,6 +219,7 @@ class HMM(nn.Module):
                 predict = torch.cat((predict, self.Viterbi(x[0][i]).reshape(1, len(x[0][i]))), axis=1)
                 # print(predict)
                 y = torch.cat((y, torch.tensor([x[1][i]])), axis=1)
+                # print(y)
                 if(i%100==0):
                     print("acc,macro-F1,micro-F1:",self.measure(predict[0],y[0]))
 

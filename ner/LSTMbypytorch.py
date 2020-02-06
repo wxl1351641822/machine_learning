@@ -49,12 +49,14 @@ class LSTMTagger(nn.Module):
         #         embeds=sentence
 
         embeds = self.word_embeddings(sentence)
-        print(embeds)
+        # print(embeds)
         lstm_out, self.hidden = self.lstm(
             embeds.view(len(sentence), 1, -1), self.hidden)
         tag_space = self.hidden2tag(lstm_out.view(len(sentence), -1))
         tag_scores = F.log_softmax(tag_space, dim=1)
         return tag_scores
+
+
 model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix))
 loss_function = nn.NLLLoss()
 optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
@@ -65,7 +67,7 @@ optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
 with torch.no_grad():
     inputs = prepare_sequence(training_data[0][0], word_to_ix)
     tag_scores = model(inputs)
-    print(tag_scores)
+    # print(tag_scores)
 
 for epoch in range(1):  # 实际情况下你不会训练300个周期, 此例中我们只是随便设了一个值
     for sentence, tags in training_data:
@@ -81,9 +83,11 @@ for epoch in range(1):  # 实际情况下你不会训练300个周期, 此例中�
         sentence_in = prepare_sequence(sentence, word_to_ix)
         targets = prepare_sequence(tags, tag_to_ix)
 
+
         # 第三步: 前向传播.
         tag_scores = model(sentence_in)
-
+        print(targets)
+        print(tag_scores)
         # 第四步: 计算损失和梯度值, 通过调用 optimizer.step() 来更新梯度
         loss = loss_function(tag_scores, targets)
         loss.backward()
@@ -99,4 +103,4 @@ with torch.no_grad():
     # 到的结果是0 1 2 0 1. 因为 索引是从0开始的, 因此第一个值0表示第一行的
     # 最大值, 第二个值1表示第二行的最大值, 以此类推. 所以最后的结果是 DET
     # NOUN VERB DET NOUN, 整个序列都是正确的!
-    print(tag_scores)
+    # print(tag_scores)

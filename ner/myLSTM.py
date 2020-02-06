@@ -47,10 +47,10 @@ class LSTMTag:
         dL_dtagspace=torch.exp(self.Loss)-1
         self.Loss=torch.sum(self.Loss,axis=1)
         # print(dL_dtagspace.shape)
-        d_hidden2tag=torch.matmul(torch.transpose(self.o.view(len(x),-1),1,0),dL_dtagspace)
+        d_hidden2tag=torch.matmul(torch.transpose(self.o.view(len(y),-1),1,0),dL_dtagspace)
         dL_do=torch.matmul(dL_dtagspace,torch.transpose(self.hidden2tag,1,0))
         # print(dL_do)
-        dL_dembedding=self.lstm.BPTT(dL_do.view(len(x),1,-1))
+        dL_dembedding=self.lstm.BPTT(dL_do.view(len(y),1,-1))
         # print(self.one_hot.shape)
 
         dL_dEm=torch.matmul(torch.transpose(self.one_hot,1,0),dL_dembedding.view(len(y),-1))
@@ -131,7 +131,7 @@ class LSTM:
     def BPTT(self,dL_do):
         # dL_do=torch.cat((torch.zeros(1,dL_do.shape[1],dL_do.shape[2]),dL_do),axis=0)
 
-        print(dL_do)
+        # print(dL_do)
         dL_dq=torch.zeros(dL_do.shape)
         dL_ds=torch.zeros(dL_do.shape)
         dL_dqx = torch.zeros(dL_do.shape)
@@ -168,7 +168,7 @@ class LSTM:
 
         dL_dx = torch.zeros(self.x.shape)
         for i in range(len(dL_do)-1,-1,-1):
-            print(i)
+            # print(i)
             dL_dq[i] = self.tanh(self.c[i]) * dL_do[i]
             dL_ds[i] += dL_do[i] * (1 - self.tanh(self.c[i]) * self.tanh(self.c[i])) * self.q[i]
 
@@ -246,41 +246,41 @@ class LSTM:
         # dL_dUo = torch.matmul(torch.transpose(self.x.view(self.h.shape[0], -1), 1, 0), dL_dbo.view(self.h.shape[0], -1))
         # self.bo=self.bo-self.lr*dL_dbo
         # self.Wo=self.Wo-self.lr*dL_dWo
+#
+# def prepare_sequence(seq, to_ix):
+#     idxs = [to_ix[w] for w in seq]
+#     return torch.tensor(idxs, dtype=torch.long)
 
-def prepare_sequence(seq, to_ix):
-    idxs = [to_ix[w] for w in seq]
-    return torch.tensor(idxs, dtype=torch.long)
-
-training_data = [
-    ("The dog ate the apple".split(), ["DET", "NN", "V", "DET", "NN"]),
-    ("Everybody read that book".split(), ["NN", "V", "DET", "NN"])
-]
-word_to_ix = {}
-for sent, tags in training_data:
-    for word in sent:
-        if word not in word_to_ix:
-            word_to_ix[word] = len(word_to_ix)
-print(word_to_ix)
-tag_to_ix = {"DET": 0, "NN": 1, "V": 2}
-
-# 实际中通常使用更大的维度如32维, 64维.
-# 这里我们使用小的维度, 为了方便查看训练过程中权重的变化.
-EMBEDDING_DIM = 6
-HIDDEN_DIM = 6
-
-model = LSTMTag(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix),1)
-
-x=prepare_sequence(training_data[0][0],word_to_ix)
-y=prepare_sequence(training_data[0][1],tag_to_ix)
-print(model.forward(x))
-# model.BP(y)
-for epoch in range(30):
-    for sentence, tags in training_data:
-        x = prepare_sequence(sentence, word_to_ix)
-        y = prepare_sequence(tags, tag_to_ix)
-        model.forward(x)
-        model.BP(y)
-
-x=prepare_sequence(training_data[0][0],word_to_ix)
-y=prepare_sequence(training_data[0][1],tag_to_ix)
-print(model.forward(x))
+# training_data = [
+#     ("The dog ate the apple".split(), ["DET", "NN", "V", "DET", "NN"]),
+#     ("Everybody read that book".split(), ["NN", "V", "DET", "NN"])
+# ]
+# word_to_ix = {}
+# for sent, tags in training_data:
+#     for word in sent:
+#         if word not in word_to_ix:
+#             word_to_ix[word] = len(word_to_ix)
+# print(word_to_ix)
+# tag_to_ix = {"DET": 0, "NN": 1, "V": 2}
+#
+# # 实际中通常使用更大的维度如32维, 64维.
+# # 这里我们使用小的维度, 为了方便查看训练过程中权重的变化.
+# EMBEDDING_DIM = 6
+# HIDDEN_DIM = 6
+#
+# model = LSTMTag(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix),1)
+#
+# x=prepare_sequence(training_data[0][0],word_to_ix)
+# y=prepare_sequence(training_data[0][1],tag_to_ix)
+# print(model.forward(x))
+# # model.BP(y)
+# for epoch in range(30):
+#     for sentence, tags in training_data:
+#         x = prepare_sequence(sentence, word_to_ix)
+#         y = prepare_sequence(tags, tag_to_ix)
+#         model.forward(x)
+#         model.BP(y)
+#
+# x=prepare_sequence(training_data[0][0],word_to_ix)
+# y=prepare_sequence(training_data[0][1],tag_to_ix)
+# print(model.forward(x))
