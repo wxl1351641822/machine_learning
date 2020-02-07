@@ -355,6 +355,7 @@ if __name__=='__main__':
     labels = list(range(len(dic_label)))
     # print(labels)
     model1 = CRF(len(dic_word), len(dic_label), get_feature_functions(wordset, labels, traindata[0]))
+
     model1.train(traindata)
 
 

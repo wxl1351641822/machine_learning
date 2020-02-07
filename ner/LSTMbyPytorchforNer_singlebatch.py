@@ -33,30 +33,31 @@ class LSTMTagger(nn.Module):
         lstm_out, self.hidden = self.lstm(
             embeds.view(len(sentence), 1, -1), self.hidden)
         # print(lstm_out)
-        tag_space = self.hidden2tag(lstm_out.view(len(sentence), -1))
+        tag_space = torch.tanh(self.hidden2tag(lstm_out.view(len(sentence), -1)))
         tag_scores = F.log_softmax(tag_space, dim=1)
         return tag_scores
 
 def measure(predict,y):
     acc = (torch.sum(torch.eq(predict, y))).type(torch.FloatTensor) / float(len(y))
-    TP=torch.zeros( len(dic_label_list),dtype=float)
-    FP=torch.zeros( len(dic_label_list),dtype=float)
-    FN=torch.zeros( len(dic_label_list),dtype=float)
+    TP=torch.zeros( len(dic_label_list)-2,dtype=float)
+    FP=torch.zeros( len(dic_label_list)-2,dtype=float)
+    FN=torch.zeros( len(dic_label_list)-2,dtype=float)
     for i in range(len(y)):
         if(y[i]==predict[i]):
-            TP[y[i]]+=1
+            TP[y[i]-1]+=1
         else:
-            FP[predict[i]]+=1
-            FN[y[i]]+=1
+            FP[predict[i]-1]+=1
+            FN[y[i]-1]+=1
     # micro:算总的
     # print(torch.sum(TP))
+    print(TP)
     micro_precision=torch.sum(TP)/(torch.sum(TP)+torch.sum(FP))
     micro_recall=torch.sum(TP)/(torch.sum(TP)+torch.sum(FN))
     micro_F1=2*(micro_precision*micro_recall)/(micro_precision+micro_recall)
     # macro ：算每一类的然后平均
-    TP[TP==0]=1e-8
-    FP[FP==0]=1e-8
-    FN[FN==0]=1e-8
+    # TP[TP==0]=1e-8
+    # FP[FP==0]=1e-8
+    # FN[FN==0]=1e-8
     macro_precision=TP/(TP+FP)
     macro_recall=TP/(TP+FN)
 
@@ -66,6 +67,9 @@ def measure(predict,y):
     print(acc,micro_F1,macro_F1)
     return acc,micro_F1,macro_F1
 
+# y=torch.tensor([0,0,0,0,1,1,1,2,2])
+# predict=torch.tensor([0,0,1,2,1,1,2,1,2])
+# measure(predict,y)
 traindata,dic_word_list,dic_label_list,dic_word,dic_label=getAllTrain()
 # print(traindata)
 EMBEDDING_DIM=300
@@ -78,13 +82,15 @@ optimizer = torch.optim.SGD(model.parameters(), lr=0.001)
 # 查看训练前的分数
 # 注意: 输出的 i,j 元素的值表示单词 i 的 j 标签的得分
 # 这里我们不需要训练不需要求导所以使用torch.no_grad()
+print(traindata[0][0])
+print(traindata[1][0])
 with torch.no_grad():
     inputs = torch.tensor(traindata[0][1])
     tag_scores = model(inputs)
     # print(tag_scores)
 
-for epoch in range(2):  # 实际情况下你不会训练300个周期, 此例中我们只是随便设了一个值
-    for sentence, tags in tqdm(zip(traindata[0][:-100],traindata[1][:-100])):
+for epoch in range(1):  # 实际情况下你不会训练300个周期, 此例中我们只是随便设了一个值
+    for sentence, tags in tqdm(zip(traindata[0][:2000],traindata[1][:2000])):
         # 第一步: 请记住Pytorch会累加梯度.
         # 我们需要在训练每个实例前清空梯度
         model.zero_grad()
@@ -112,13 +118,13 @@ for epoch in range(2):  # 实际情况下你不会训练300个周期, 此例中�
 
 # 查看训练后的得分
 with torch.no_grad():
-    y = torch.tensor([traindata[1][-100]])
-    sentence_in = torch.tensor(traindata[0][-100])
+    y = torch.tensor([traindata[1][-2000]])
+    sentence_in = torch.tensor(traindata[0][-2000])
     tag_scores = model(sentence_in)
 
-    predict = torch.max(tag_scores, axis=1)[1].reshape(1,len(traindata[1][-100]))
+    predict = torch.max(tag_scores, axis=1)[1].reshape(1,len(traindata[1][-2000]))
 
-    for sentence, tags in zip(traindata[0][-101:], traindata[1][-101:]):
+    for sentence, tags in zip(traindata[0][:2000],traindata[1][:2000]):
         # 准备网络输入, 将其变为词索引的 Tensor 类型数据
         sentence_in = torch.tensor(sentence)
         # targets = torch.tensor(tags)
@@ -130,9 +136,10 @@ with torch.no_grad():
 
         x0=[dic_word_list[s] for s in sentence]
         y0=[dic_label_list[t] for t in tags]
+        predict0=[dic_label_list[t] for t in torch.max(tag_scores,axis=1)[1]]
         print(x0)
         print(y0)
-
+        print(predict0)
     # print(predict.shape)
     # print(y.shape)
     measure(predict.reshape(y.shape[1]),y.reshape(y.shape[1]))

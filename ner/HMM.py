@@ -170,7 +170,6 @@ class HMM(nn.Module):
         # torch.sum(transition[0])
 
     def getb(self,x):
-
         self.b = torch.zeros(self.y_size,self.x_size)
         for row in range(len(x[0])):
             for i in range(len(x[0][row])):
@@ -225,24 +224,24 @@ class HMM(nn.Module):
 
     def measure(self,predict,y):
         acc = (torch.sum(torch.eq(predict, y))).type(torch.FloatTensor) / float(len(y))
-        TP=torch.zeros(self.y_size,dtype=float)
-        FP=torch.zeros(self.y_size,dtype=float)
-        FN=torch.zeros(self.y_size,dtype=float)
+        TP=torch.zeros(self.y_size-2,dtype=float)
+        FP=torch.zeros(self.y_size-2,dtype=float)
+        FN=torch.zeros(self.y_size-2,dtype=float)
         for i in range(len(y)):
             if(y[i]==predict[i]):
-                TP[y[i]]+=1
+                TP[y[i]-1]+=1
             else:
-                FP[predict[i]]+=1
-                FN[y[i]]+=1
+                FP[predict[i]-1]+=1
+                FN[y[i]-1]+=1
         # micro:算总的
         print(torch.sum(TP))
         micro_precision=torch.sum(TP)/(torch.sum(TP)+torch.sum(FP))
         micro_recall=torch.sum(TP)/(torch.sum(TP)+torch.sum(FN))
         micro_F1=2*(micro_precision*micro_recall)/(micro_precision+micro_recall)
         # macro ：算每一类的然后平均
-        TP[TP==0]=self.epsilon
-        FP[FP==0]=self.epsilon
-        FN[FN==0]=self.epsilon
+        # TP[TP==0]=self.epsilon
+        # FP[FP==0]=self.epsilon
+        # FN[FN==0]=self.epsilon
         macro_precision=TP/(TP+FP)
         macro_recall=TP/(TP+FN)
         print("TP:",TP)
