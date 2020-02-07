@@ -48,7 +48,7 @@
 				* lossfunction带batch输入怎么办？？？
 			* LSTMbyPytorchforNer_singlebatch--一次输入一个句子
 			* myLSTMforNer---自实现LSTM(用于ner）
-		* LSTM_CRF
+		* LSTM_CRF[博客](https://blog.csdn.net/weixin_40485502/article/details/104215235#2Sigma_t1TlambdaTfy_t1y_txetaTgy_tx_587)
 			* LSTM_CRF(别人的，参考）
 			* LSTM_CRFbyPytorchforNer_singlebatch.py
 				* ner
