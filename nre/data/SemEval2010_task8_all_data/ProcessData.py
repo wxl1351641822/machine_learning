@@ -1,5 +1,44 @@
 from stanfordcorenlp import StanfordCoreNLP
 from tqdm import tqdm
+import constant
+import re
+
+def clean_str(text):
+    text = text.lower()
+    # Clean the text
+    text = re.sub(r"[^A-Za-z0-9^,!.\/'+-=]", " ", text)
+    text = re.sub(r"what's", "what is ", text)
+    text = re.sub(r"that's", "that is ", text)
+    text = re.sub(r"there's", "there is ", text)
+    text = re.sub(r"it's", "it is ", text)
+    text = re.sub(r"\'s", " ", text)
+    text = re.sub(r"\'ve", " have ", text)
+    text = re.sub(r"can't", "can not ", text)
+    text = re.sub(r"n't", " not ", text)
+    text = re.sub(r"i'm", "i am ", text)
+    text = re.sub(r"\'re", " are ", text)
+    text = re.sub(r"\'d", " would ", text)
+    text = re.sub(r"\'ll", " will ", text)
+    text = re.sub(r",", " ", text)
+    text = re.sub(r"\.", " ", text)
+    text = re.sub(r"!", " ! ", text)
+    text = re.sub(r"\/", " ", text)
+    text = re.sub(r"\^", " ^ ", text)
+    text = re.sub(r"\+", " + ", text)
+    text = re.sub(r"\-", " - ", text)
+    text = re.sub(r"\=", " = ", text)
+    text = re.sub(r"'", " ", text)
+    text = re.sub(r"(\d+)(k)", r"\g<1>000", text)
+    text = re.sub(r":", " : ", text)
+    text = re.sub(r" e g ", " eg ", text)
+    text = re.sub(r" b g ", " bg ", text)
+    text = re.sub(r" u s ", " american ", text)
+    text = re.sub(r"\0s", "0", text)
+    text = re.sub(r" 9 11 ", "911", text)
+    text = re.sub(r"e - mail", "email", text)
+    text = re.sub(r"j k", "jk", text)
+    text = re.sub(r"\s{2,}", " ", text)
+    return text.strip()
 
 def read_semEval(path):
     datalist=[]
@@ -20,53 +59,52 @@ def read_semEval(path):
             e2_start = -1
             e2_end = -1
             id,sentence=data.split("\t")
+            sentence = sentence.replace('<e1>', ' _'+constant.SUBJ_START+'_ ')
+            sentence = sentence.replace('</e1>',  ' _'+constant.SUBJ_END+'_ ')
+            sentence = sentence.replace('<e2>',  ' _'+constant.OBJ_START+'_ ')
+            sentence = sentence.replace('</e2>',  ' _'+constant.OBJ_END+'_ ')
+            sentence=clean_str(sentence)
+            # print(sentence)
             # print(id)
             # print(sentence[1:-2])
-            token=sentence[1:-3].split()
+            # sentence = sentence.replace(constant.SUBJ_START,' '+constant.SUBJ_START+' ')
+            # sentence = sentence.replace(constant.SUBJ_END, ' '+constant.SUBJ_END+' ')
+            # sentence = sentence.replace(constant.OBJ_START, ' '+constant.OBJ_START+' ')
+            # sentence = sentence.replace(constant.OBJ_END, ' '+constant.OBJ_END+' ')
+            token=sentence.split()
             for j,t in enumerate(token):
-                if('<e1>' in t or '<e1>' in t):
+                if(constant.SUBJ_START in t):
                     e1_start=j
-                    token[j]=token[j].replace('<e1>','')
-                if ('</e1>' in t):
+                if (constant.SUBJ_END in t):
                     e1_end = j
-                    token[j] = token[j].replace('</e1>', '')
-                if ('<e2>' in t or '<e2>' in t):
+                if (constant.OBJ_START in t):
                     e2_start = j
-                    token[j] = token[j].replace('<e2>', '')
-                if ('</e2>' in t):
+                if (constant.OBJ_END in t):
                     e2_end = j
-                    token[j] = token[j].replace('</e2>', '')
             row={}
-            sentence=sentence.replace('<e1>','')
-            sentence = sentence.replace('</e1>', '')
-            sentence = sentence.replace('<e2>', '')
-            sentence = sentence.replace('</e2>', '')
+            # print(token)
+            # print(e1_start,e1_end,e2_start,e2_end)
+
             row['id']=int(id)
-            row['sentence']=sentence[1:-2]
+            row['sentence']=sentence
             row['token']=token
-            pos,dependency,dependency_head=stanford_pos(nlp,sentence[1:-2])
+            pos,dependency,dependency_head=stanford_pos(nlp,sentence)
             row['stanford_pos']=pos
             row['stanford_dependency']=dependency
             row['stanford_dependency_head'] = dependency_head
+            row['relation_subj_start'] = e1_start
+            row['relation_subj_end'] = e1_end
+            row['relation_obj_start'] = e2_start
+            row['relation_obj_end'] = e2_end
+            # print(row)
         elif(i%4==1):
-            # print(data[:-8])
-            if(data[:-1]=='Other'):
-                row['relation']=data[:-1]
+            # print(data[:-1])
+            if(data[:-1]=='other'):
+                # print(data['relation'])
+                row['relation']='other'
             else:
-                row['relation']=data[:-8]
-                head=data[-7:-5]
-                tail=data[-4:-2]
-                # print(head,tail)
-                if(head=='e1'):#e1->e2:subj->obj
-                    row['relation_subj_start']=e1_start
-                    row['relation_subj_end'] = e1_end
-                    row['relation_obj_start'] = e2_start
-                    row['relation_obj_end'] = e2_end
-                else:
-                    row['relation_subj_start'] = e2_start
-                    row['relation_subj_end'] = e2_end
-                    row['relation_obj_start'] = e1_start
-                    row['relation_obj_end'] = e1_end
+                row['relation']=data[:-1]
+
         elif(i%4==2):
             row['Comment']=data[8:-1]
             result.append(row)
@@ -95,9 +133,14 @@ def stanford_pos(nlp,sentence):
 
 
 
-# train=read_semEval('./TRAIN_FILE.TXT')
-# with open('./mytrain.json', 'w', encoding='utf-8') as f:
-#     f.write(str(train))
+
+
+train=read_semEval('./TRAIN_FILE.TXT')
+with open('./mytrain.json', 'w', encoding='utf-8') as f:
+    f.write(str(train))
 test=read_semEval('./TEST_FILE_FULL.TXT')
 with open('./mytest.json', 'w', encoding='utf-8') as f:
     f.write(str(test))
+
+
+# get_labellist(constant.train_path,constant.label_path)
